@@ -1,9 +1,10 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Camera, LoaderCircle, ScanFace, Sparkles } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import * as blazeface from '@tensorflow-models/blazeface';
 import '@tensorflow/tfjs';
+import EmotionOrbs from '../components/ui/EmotionOrbs';
 import { analyzeMood, analyzeMoodDebug, saveMood } from '../services/moodService';
 
 function MoodDetectionPage() {
@@ -26,6 +27,15 @@ function MoodDetectionPage() {
       { key: 'Sad', value: scores.Sad || 0, color: 'bg-rose-400/80' }
     ].sort((a, b) => b.value - a.value);
   }, [debugResult]);
+
+  const orbs = useMemo(() => {
+    if (!lastResult) return [];
+    return [
+      { emotion: lastResult.emotion, confidence: lastResult.confidence, color: 'bg-emotion-happy' },
+      { emotion: 'Confidence', confidence: lastResult.confidence, color: 'bg-emotion-neutral' },
+      { emotion: 'Stability', confidence: Math.min(1, 1 - (debugBars[0]?.value || 0)), color: 'bg-emotion-sad' }
+    ];
+  }, [debugBars, lastResult]);
 
   const statusText = useMemo(() => {
     if (loading) return 'Analyzing frame...';
@@ -117,11 +127,7 @@ function MoodDetectionPage() {
         </div>
 
         <motion.div
-          animate={
-            loading
-              ? { boxShadow: '0 0 0 1px rgba(45,226,230,.35), 0 0 40px rgba(45,226,230,.2)' }
-              : {}
-          }
+          animate={loading ? { boxShadow: '0 0 0 1px rgba(45,226,230,.35), 0 0 40px rgba(45,226,230,.2)' } : {}}
           className="relative overflow-hidden rounded-2xl border border-white/15 bg-slate-950/30 p-2"
         >
           <Webcam
@@ -129,6 +135,12 @@ function MoodDetectionPage() {
             screenshotFormat="image/jpeg"
             videoConstraints={{ facingMode: 'user' }}
             className="aspect-video w-full rounded-xl object-cover"
+          />
+
+          <motion.div
+            animate={loading ? { top: ['0%', '100%'], opacity: [0, 0.7, 0] } : { opacity: 0 }}
+            transition={{ duration: 2.1, repeat: loading ? Infinity : 0, ease: 'easeInOut' }}
+            className="pointer-events-none absolute left-4 right-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-300 to-transparent"
           />
 
           <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full border border-white/20 bg-slate-900/70 px-3 py-1 text-xs backdrop-blur-xl">
@@ -156,48 +168,73 @@ function MoodDetectionPage() {
             Save Mood
           </button>
         </div>
+
+        <AnimatePresence>
+          {saved ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mt-4 rounded-2xl border border-teal-400/25 bg-teal-400/10 px-4 py-3 text-sm text-teal-100"
+            >
+              Mood entry saved successfully.
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
-      <div className="glass neo-border rounded-3xl p-5 lg:col-span-4">
-        <h3 className="font-display text-lg text-slate-100">Live Emotion Badge</h3>
-        <p className="mt-1 text-sm text-slate-400">AI status stream and mood confidence.</p>
+      <div className="grid gap-4 lg:col-span-4">
+        <div className="glass neo-border rounded-3xl p-5">
+          <h3 className="font-display text-lg text-slate-100">Live Emotion Badge</h3>
+          <p className="mt-1 text-sm text-slate-400">AI status stream and mood confidence.</p>
 
-        <motion.div
-          animate={{ scale: loading ? [1, 1.03, 1] : 1 }}
-          transition={{ duration: 1.4, repeat: loading ? Infinity : 0 }}
-          className="mt-4 rounded-2xl border border-cyan-300/30 bg-cyan-400/10 p-4"
-        >
-          <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/90">Emotion</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-100">{lastResult?.emotion || 'Neutral'}</p>
-          <p className="mt-1 text-sm text-slate-300">Confidence: {Math.round((lastResult?.confidence || 0) * 100)}%</p>
-        </motion.div>
+          <motion.div
+            animate={{ scale: loading ? [1, 1.03, 1] : 1 }}
+            transition={{ duration: 1.4, repeat: loading ? Infinity : 0 }}
+            className="mt-4 rounded-2xl border border-cyan-300/30 bg-cyan-400/10 p-4"
+          >
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/90">Emotion</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-100">{lastResult?.emotion || 'Neutral'}</p>
+            <p className="mt-1 text-sm text-slate-300">Confidence: {Math.round((lastResult?.confidence || 0) * 100)}%</p>
+          </motion.div>
 
-        <div className="mt-4 space-y-2 text-sm text-slate-300">
-          <p>{statusText}</p>
-          <p>Face model: {faceReady ? 'Ready' : 'Loads on first scan'}</p>
-          {debugResult ? <p>Detector: {debugResult.detection_method} ({debugResult.fer_available ? 'FER ready' : 'Fallback mode'})</p> : null}
+          <div className="mt-4 space-y-2 text-sm text-slate-300">
+            <p>{statusText}</p>
+            <p>Face model: {faceReady ? 'Ready' : 'Loads on first scan'}</p>
+            {debugResult ? <p>Detector: {debugResult.detection_method} ({debugResult.fer_available ? 'FER ready' : 'Fallback mode'})</p> : null}
+          </div>
+        </div>
+
+        <div className="glass neo-border rounded-3xl p-5">
+          <h3 className="font-display text-lg text-slate-100">Emotion Orbs</h3>
+          <p className="mt-1 text-sm text-slate-400">Animated confidence cues for the detected emotional mix.</p>
+          <div className="mt-4">
+            <EmotionOrbs items={orbs.length ? orbs : undefined} />
+          </div>
+        </div>
+
+        <div className="glass neo-border rounded-3xl p-5">
+          <h3 className="font-display text-lg text-slate-100">Score Buckets</h3>
           {debugResult?.grouped_scores ? (
-            <div className="rounded-xl border border-white/15 bg-slate-900/35 p-3 text-xs text-slate-200">
-              <p className="uppercase tracking-[0.12em] text-slate-400">Score Buckets</p>
-              <div className="mt-2 space-y-2">
-                {debugBars.map((bar) => (
-                  <div key={bar.key}>
-                    <div className="mb-1 flex items-center justify-between text-[11px]">
-                      <span>{bar.key}</span>
-                      <span>{Math.round(bar.value * 100)}%</span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                      <div
-                        className={`h-full rounded-full ${bar.color} transition-all duration-300`}
-                        style={{ width: `${Math.max(4, Math.round(bar.value * 100))}%` }}
-                      />
-                    </div>
+            <div className="mt-3 space-y-2 text-xs text-slate-200">
+              {debugBars.map((bar) => (
+                <div key={bar.key}>
+                  <div className="mb-1 flex items-center justify-between text-[11px]">
+                    <span>{bar.key}</span>
+                    <span>{Math.round(bar.value * 100)}%</span>
                   </div>
-                ))}
-              </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className={`h-full rounded-full ${bar.color} transition-all duration-300`}
+                      style={{ width: `${Math.max(4, Math.round(bar.value * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ) : null}
-          {saved ? <p className="text-teal-300">Mood entry saved successfully.</p> : null}
+          ) : (
+            <p className="mt-3 text-sm text-slate-400">Run a scan to reveal grouped model scores.</p>
+          )}
         </div>
       </div>
     </section>

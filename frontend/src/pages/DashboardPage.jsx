@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Brain, Moon, Sparkles, Trophy, Waves, Zap } from 'lucide-react';
+import { Brain, History, Moon, Sparkles, Trophy, Waves, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
+import BrainMeshWidget from '../components/ui/BrainMeshWidget';
 import { getAnalytics } from '../services/moodService';
 import { useAuth } from '../context/AuthContext';
 import { createMoodSocket } from '../services/socketService';
@@ -60,7 +61,7 @@ function GlassTooltip({ active, payload }) {
 
 function DashboardPage() {
   const { user } = useAuth();
-  const { graphRange, setGraphRange } = useUiStore();
+  const { graphRange, setGraphRange, liveFeed, addLiveEvent } = useUiStore();
   const [analytics, setAnalytics] = useState({
     weekly: [],
     monthly: [],
@@ -76,6 +77,7 @@ function DashboardPage() {
   const sleepScore = useMemo(() => Math.max(52, Math.round(100 - (analytics.stress_score || 0) * 0.45)), [analytics.stress_score]);
   const streakDays = useMemo(() => Math.max(1, Math.round((user?.points || 0) / 25)), [user?.points]);
   const progression = useMemo(() => Math.min(100, ((user?.points || 0) % 500) / 5), [user?.points]);
+  const latestFeed = useMemo(() => liveFeed.slice(0, 5), [liveFeed]);
 
   useEffect(() => {
     async function load() {
@@ -107,8 +109,15 @@ function DashboardPage() {
 
   useEffect(() => {
     const socket = createMoodSocket(user?.id, (payload) => {
-      if (payload.type === 'mood_update') {
+      if (payload?.type === 'mood_update' || payload?.type === 'mood_saved') {
         setLiveMood(payload);
+        addLiveEvent({
+          id: `${payload.type}-${Date.now()}`,
+          type: payload.type,
+          title: payload.type === 'mood_saved' ? 'Mood saved' : 'Live mood update',
+          message: payload.emotion ? `${payload.emotion} ${payload.confidence ? `(${Math.round(payload.confidence * 100)}%)` : ''}` : 'Realtime event received',
+          created_at: new Date().toISOString()
+        });
       }
     });
 
@@ -132,29 +141,59 @@ function DashboardPage() {
     );
   }
 
-  return (
-    <section className="grid gap-4 lg:grid-cols-12">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass neo-border relative overflow-hidden rounded-3xl p-6 lg:col-span-8"
-      >
-        <div className="pointer-events-none absolute -right-16 -top-10 h-44 w-44 rounded-full bg-violet-400/15 blur-3xl" />
-        <p className="mb-1 text-xs uppercase tracking-[0.26em] text-cyan-300/80">AI Wellness Hub</p>
-        <h2 className="font-display text-2xl text-slate-100">Cognitive State Snapshot</h2>
-        <p className="mt-2 max-w-xl text-sm text-slate-300">
-          Real-time emotional inference, stress forecasting, and behavioral recommendations powered by multimodal AI.
-        </p>
+  const cardVariants = {
+    hidden: { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0 }
+  };
 
-        {liveMood ? (
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/35 bg-cyan-300/10 px-4 py-1 text-xs text-cyan-100 animate-pulseGlow">
-            <Sparkles size={14} />
-            Live mood: {liveMood.emotion} ({Math.round(liveMood.confidence * 100)}%)
+  return (
+    <motion.section
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } }
+      }}
+      className="grid gap-4 lg:grid-cols-12"
+    >
+      <motion.div
+        variants={cardVariants}
+        className="glass neo-border relative min-h-[340px] overflow-hidden rounded-3xl p-6 lg:col-span-8"
+      >
+        <BrainMeshWidget />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-neural-500/10 via-transparent to-pulse-500/10" />
+        <div className="relative z-10 flex h-full flex-col justify-between gap-6">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-[0.26em] text-cyan-300/80">AI Wellness Hub</p>
+            <h2 className="font-display text-2xl text-slate-100">Cognitive State Snapshot</h2>
+            <p className="mt-2 max-w-xl text-sm text-slate-300">
+              Real-time emotional inference, stress forecasting, and behavioral recommendations powered by multimodal AI.
+            </p>
+
+            {liveMood ? (
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-300/35 bg-cyan-300/10 px-4 py-1 text-xs text-cyan-100 animate-pulseGlow">
+                <Sparkles size={14} />
+                Live mood: {liveMood.emotion} ({Math.round((liveMood.confidence || 0) * 100)}%)
+              </div>
+            ) : null}
           </div>
-        ) : null}
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              { label: 'Prediction', value: analytics.predicted_next_mood },
+              { label: 'Stress', value: `${Math.round(analytics.stress_score || 0)}%` },
+              { label: 'Sleep', value: `${sleepScore}%` }
+            ].map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/12 bg-white/5 p-3 backdrop-blur-xl">
+                <p className="text-[11px] uppercase tracking-[0.22em] text-slate-400">{item.label}</p>
+                <p className="mt-2 font-display text-xl text-slate-100">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </motion.div>
 
-      <div className="glass neo-border rounded-3xl p-5 lg:col-span-4">
+      <motion.div variants={cardVariants} className="glass neo-border rounded-3xl p-5 lg:col-span-4">
         <p className="text-xs uppercase tracking-[0.26em] text-slate-400">Gamification</p>
         <h3 className="mt-2 font-display text-lg text-slate-100">Mindfulness Streak</h3>
         <p className="mt-1 text-sm text-slate-300">{streakDays} day streak active</p>
@@ -178,7 +217,7 @@ function DashboardPage() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {cardMeta.map((card, index) => {
         const Icon = card.icon;
@@ -194,8 +233,7 @@ function DashboardPage() {
         return (
           <motion.div
             key={card.key}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            variants={cardVariants}
             transition={{ delay: 0.05 * index }}
             whileHover={{ scale: 1.02, y: -4 }}
             className={`glass neo-border group relative overflow-hidden rounded-3xl p-4 lg:col-span-3`}
@@ -217,7 +255,7 @@ function DashboardPage() {
         );
       })}
 
-      <div className="glass neo-border rounded-3xl p-5 lg:col-span-8">
+      <motion.div variants={cardVariants} className="glass neo-border rounded-3xl p-5 lg:col-span-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-display text-lg text-slate-100">AI Emotion Trend Graph</h3>
@@ -261,25 +299,51 @@ function DashboardPage() {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
-      <div className="glass neo-border rounded-3xl p-5 lg:col-span-4">
-        <h3 className="font-display text-lg text-slate-100">Smart Recommendations</h3>
-        <p className="mt-1 text-sm text-slate-400">Personalized nudges generated from your current signals.</p>
+      <motion.div variants={cardVariants} className="glass neo-border rounded-3xl p-5 lg:col-span-4">
+        <h3 className="font-display text-lg text-slate-100">Quick Actions</h3>
+        <p className="mt-1 text-sm text-slate-400">Open the next step in the wellness flow.</p>
 
-        <div className="mt-4 space-y-3">
-          {['Take a mindful break', 'Hydrate and go for a walk', '2-minute guided breathing'].map((tip) => (
-            <motion.div
-              key={tip}
-              whileHover={{ rotateX: -4, scale: 1.02 }}
-              className="rounded-2xl border border-white/15 bg-white/5 p-3"
+        <div className="mt-4 grid gap-3">
+          {[
+            { label: 'Check Mood', icon: Brain, action: () => window.location.assign('/mood') },
+            { label: 'Open Analytics', icon: History, action: () => window.location.assign('/analytics') },
+            { label: 'View Tips', icon: Sparkles, action: () => window.location.assign('/recommendations') }
+          ].map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              onClick={item.action}
+              className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 p-3 text-left transition hover:bg-white/10"
             >
-              <p className="text-sm text-slate-100">{tip}</p>
-            </motion.div>
+              <item.icon size={16} className="text-cyan-200" />
+              <span className="text-sm text-slate-100">{item.label}</span>
+            </button>
           ))}
         </div>
-      </div>
-    </section>
+      </motion.div>
+
+      <motion.div variants={cardVariants} className="glass neo-border rounded-3xl p-5 lg:col-span-4">
+        <h3 className="font-display text-lg text-slate-100">Live Feed</h3>
+        <p className="mt-1 text-sm text-slate-400">Recent websocket events and status changes.</p>
+
+        <div className="mt-4 space-y-2">
+          {latestFeed.length === 0 ? (
+            <div className="rounded-2xl border border-white/15 bg-white/5 p-3 text-sm text-slate-400">
+              Waiting for live mood updates.
+            </div>
+          ) : (
+            latestFeed.map((item) => (
+              <div key={item.id} className="rounded-2xl border border-white/15 bg-white/5 p-3">
+                <p className="text-sm text-slate-100">{item.title}</p>
+                <p className="text-xs text-slate-400">{item.message}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </motion.div>
+    </motion.section>
   );
 }
 

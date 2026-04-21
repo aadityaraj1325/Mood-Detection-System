@@ -1,6 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NeuralNetworkHero from '../components/ui/NeuralNetworkHero';
 
 function getErrorMessage(err) {
   const detail = err?.response?.data?.detail;
@@ -25,6 +27,8 @@ function getErrorMessage(err) {
 
   return 'Authentication failed';
 }
+
+const featurePills = ['AI Mood Detection', 'Personalized Insights', '100% Private'];
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -60,68 +64,99 @@ function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <div className="glass neo-border w-full max-w-lg rounded-3xl p-7">
-        <h1 className="font-display text-3xl font-semibold text-slate-100">PulseMind AI</h1>
-        <p className="mt-2 text-sm text-slate-400">AI-powered mental wellness platform for higher education.</p>
+    <div className="min-h-screen p-4 lg:p-6">
+      <div className="grid min-h-[calc(100vh-2rem)] gap-4 lg:grid-cols-2">
+        <div className="hidden lg:block">
+          <NeuralNetworkHero />
+        </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block text-sm text-slate-200">
-            <span className="mb-1 block">Email</span>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-cyan-300/45"
-            />
-          </label>
+        <div className="flex items-center justify-center">
+          <div className="glass-card w-full max-w-lg p-7">
+            <p className="text-xs uppercase tracking-[0.3em] text-neural-300/80">PulseMind AI</p>
+            <h1 className="font-display mt-3 text-3xl font-semibold text-text-primary">
+              AI-powered mental wellness platform for higher education.
+            </h1>
 
-          {!isLogin && (
-            <label className="block text-sm text-slate-200">
-              <span className="mb-1 block">Full Name</span>
-              <input
-                name="full_name"
-                value={form.full_name}
-                onChange={handleChange}
-                required
-                className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-cyan-300/45"
-              />
-            </label>
-          )}
+            <div className="mt-4 hidden flex-wrap gap-2 lg:flex">
+              {featurePills.map((pill) => (
+                <span
+                  key={pill}
+                  className="rounded-full border border-border-glass bg-glass-ultra px-3 py-1 text-xs text-text-primary"
+                >
+                  {pill}
+                </span>
+              ))}
+            </div>
 
-          <label className="block text-sm text-slate-200">
-            <span className="mb-1 block">Password</span>
-            <input
-              name="password"
-              type="password"
-              minLength={8}
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-cyan-300/45"
-            />
-          </label>
+            <AnimatePresence mode="wait">
+              <motion.form
+                key={isLogin ? 'login' : 'register'}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+                onSubmit={handleSubmit}
+                className="mt-6 space-y-4"
+              >
+                <label className="block text-sm text-text-secondary">
+                  <span className="mb-1 block">Email</span>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="input"
+                  />
+                </label>
 
-          {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+                {!isLogin && (
+                  <label className="block text-sm text-text-secondary">
+                    <span className="mb-1 block">Full Name</span>
+                    <input
+                      name="full_name"
+                      value={form.full_name}
+                      onChange={handleChange}
+                      required
+                      className="input"
+                    />
+                  </label>
+                )}
 
-          <button
-            className="ripple-btn w-full rounded-xl border border-cyan-300/40 bg-cyan-300/20 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/30"
-            disabled={loading}
-            type="submit"
-          >
-            {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
-          </button>
-        </form>
+                <label className="block text-sm text-text-secondary">
+                  <span className="mb-1 block">Password</span>
+                  <input
+                    name="password"
+                    type="password"
+                    minLength={8}
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                    className="input"
+                  />
+                </label>
 
-        <button
-          className="mt-4 text-sm text-teal-300 transition hover:text-teal-200"
-          onClick={() => setIsLogin((prev) => !prev)}
-          type="button"
-        >
-          {isLogin ? 'Create a new account' : 'Already have an account? Login'}
-        </button>
+                {error ? (
+                  <div className="rounded-md border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">
+                    {error}
+                  </div>
+                ) : null}
+
+                <button className="btn-primary w-full" disabled={loading} type="submit">
+                  {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+                </button>
+              </motion.form>
+            </AnimatePresence>
+
+            <button
+              className="mt-4 text-sm text-serenity-500 transition hover:text-serenity-400"
+              onClick={() => setIsLogin((prev) => !prev)}
+              type="button"
+            >
+              {isLogin ? 'Create a new account' : 'Already have an account? Login'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

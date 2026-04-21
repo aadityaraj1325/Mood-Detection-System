@@ -1,58 +1,73 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { loginUser, registerUser } from '../services/authService';
+import { getMe, loginUser, registerUser } from '../services/authService';
 
 const AuthContext = createContext(null);
 
-function readStoredUser() {
-  const raw = localStorage.getItem('user');
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // Clear corrupted persisted state to avoid rendering a blank app.
-    localStorage.removeItem('user');
-    return null;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [user, setUser] = useState(() => readStoredUser());
+  const [token, setToken] = useState(() => localStorage.getItem('pm_token'));
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
+    let mounted = true;
+
+    async function hydrateUser() {
+      if (!token) {
+        if (mounted) setLoading(false);
+        return;
+      }
+
+      try {
+        const profile = await getMe();
+        if (mounted) {
+          setUser(profile);
+        }
+      } catch {
+        if (mounted) {
+          setToken(null);
+          localStorage.removeItem('pm_token');
+          setUser(null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     }
+
+    hydrateUser();
+
+    return () => {
+      mounted = false;
+    };
   }, [token]);
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
+  const login = async (payloadOrEmail, maybePassword) => {
+    const payload =
+      typeof payloadOrEmail === 'string'
+        ? { email: payloadOrEmail, password: maybePassword }
+        : payloadOrEmail;
 
-  const login = async (payload) => {
     const response = await loginUser(payload);
+    localStorage.setItem('pm_token', response.access_token);
     setToken(response.access_token);
     setUser(response.user);
+    setLoading(false);
     return response;
   };
 
   const register = async (payload) => registerUser(payload);
 
   const logout = () => {
+    localStorage.removeItem('pm_token');
     setToken(null);
     setUser(null);
+    setLoading(false);
   };
 
   const value = useMemo(
-    () => ({ token, user, login, register, logout, isAuthenticated: Boolean(token) }),
-    [token, user]
+    () => ({ token, user, login, register, logout, loading, isAuthenticated: Boolean(token && user) }),
+    [token, user, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

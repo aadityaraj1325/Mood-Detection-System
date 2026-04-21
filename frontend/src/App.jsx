@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
+import AchievementsPage from './pages/AchievementsPage';
 import DashboardPage from './pages/DashboardPage';
 import MoodDetectionPage from './pages/MoodDetectionPage';
 import HistoryAnalyticsPage from './pages/HistoryAnalyticsPage';
@@ -19,12 +20,14 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<DashboardPage />} />
-        <Route path="mood-detection" element={<MoodDetectionPage />} />
-        <Route path="history" element={<HistoryAnalyticsPage />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="mood" element={<MoodDetectionPage />} />
+        <Route path="analytics" element={<HistoryAnalyticsPage />} />
         <Route path="recommendations" element={<RecommendationsPage />} />
+        <Route path="achievements" element={<AchievementsPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

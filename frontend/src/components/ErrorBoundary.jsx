@@ -20,8 +20,7 @@ class ErrorBoundary extends Component {
   }
 
   handleReset = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('pm_token');
     window.location.assign('/auth');
   };
 
@@ -30,13 +29,15 @@ class ErrorBoundary extends Component {
 
     if (hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center p-6">
-          <div className="glass neo-border w-full max-w-xl rounded-3xl p-6">
-            <h2 className="font-display text-2xl text-slate-100">Something went wrong</h2>
-            <p className="mt-2 text-sm text-slate-300">The app hit a render error and recovered into safe mode.</p>
-            <p className="mt-2 text-sm text-rose-300">{message}</p>
+        <div className="flex min-h-screen items-center justify-center bg-gradient-void p-6">
+          <div className="glass-card w-full max-w-xl p-6">
+            <h2 className="font-display text-2xl text-text-primary">Something went wrong</h2>
+            <p className="mt-2 text-sm text-text-secondary">The app hit a render error and recovered into safe mode.</p>
+            <p className="mt-2 rounded-md border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">
+              {message}
+            </p>
             <button
-              className="ripple-btn mt-4 rounded-xl border border-cyan-300/40 bg-cyan-300/15 px-4 py-2 text-sm text-cyan-100 transition hover:bg-cyan-300/25"
+              className="btn-primary mt-4"
               onClick={this.handleReset}
               type="button"
             >

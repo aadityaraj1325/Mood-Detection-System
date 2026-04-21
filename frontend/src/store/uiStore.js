@@ -15,19 +15,43 @@ const defaultNotifications = [
   }
 ];
 
-export const useUiStore = create((set) => ({
+export const useUIStore = create((set) => ({
   sidebarOpen: true,
-  theme: localStorage.getItem('theme') || 'dark',
-  notifications: defaultNotifications,
-  graphRange: 'weekly',
-  setGraphRange: (graphRange) => set({ graphRange }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+  theme: 'neural-dark',
+  setTheme: (theme) => set({ theme }),
   toggleTheme: () =>
-    set((state) => {
-      const next = state.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      return { theme: next };
-    }),
+    set((state) => ({
+      theme: state.theme === 'neural-dark' ? 'neural-light' : 'neural-dark'
+    })),
+
+  toasts: [],
+  addToast: (toast) =>
+    set((state) => ({
+      toasts: [...state.toasts, { ...toast, id: toast.id || Date.now() }]
+    })),
+  removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((item) => item.id !== id) })),
+
+  analyticsRange: 30,
+  setAnalyticsRange: (days) => set({ analyticsRange: days }),
+
+  liveFeed: [],
+  addLiveEvent: (event) =>
+    set((state) => ({
+      liveFeed: [event, ...state.liveFeed].slice(0, 20)
+    })),
+
+  // Backward compatibility keys used by existing pages/components.
+  notifications: defaultNotifications,
+  addNotification: (notification) =>
+    set((state) => ({
+      notifications: [...state.notifications, notification]
+    })),
   dismissNotification: (id) =>
-    set((state) => ({ notifications: state.notifications.filter((item) => item.id !== id) }))
+    set((state) => ({ notifications: state.notifications.filter((item) => item.id !== id) })),
+  graphRange: 'weekly',
+  setGraphRange: (graphRange) => set({ graphRange })
 }));
+
+export const useUiStore = useUIStore;
