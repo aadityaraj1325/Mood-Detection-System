@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    @apply m-0 bg-mesh-dark font-body text-slate-100 antialiased;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(141, 160, 202, 0.4) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(141, 160, 202, 0.35);
+    border-radius: 999px;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply border border-white/10 bg-white/5 backdrop-blur-xl shadow-card;
+  }
+
+  .neo-border {
+    position: relative;
+  }
+
+  .neo-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(130deg, rgba(45, 226, 230, 0.35), rgba(140, 123, 255, 0.28), rgba(46, 247, 163, 0.25));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    padding: 1px;
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+  }
+
+  .ripple-btn {
+    @apply relative overflow-hidden;
+  }
+
+  .ripple-btn::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    transform: scale(0);
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+  }
+
+  .ripple-btn:active::after {
+    animation: click-ripple 500ms ease-out;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+}
+
+@keyframes click-ripple {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.55;
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(14);
+    opacity: 0;
+  }
+}
