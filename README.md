@@ -42,37 +42,45 @@ PulseMind AI is a modular full-stack mental health support platform for higher e
 - `GET /api/notifications/daily-check`
 - `WS /api/ws/mood/{user_id}`
 
-## Local Setup (Without Docker)
-### 1) Backend
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env
-uvicorn app.main:app --reload
-```
+## Local Setup With Persistent MongoDB
+This is the recommended way to run the project if you want accounts and mood history to survive restarts.
 
-### 2) Frontend
-```bash
-cd frontend
-npm install
-copy .env.example .env
-npm run dev
-```
+### 1) Install prerequisites
+- Docker Desktop
+- Node.js 20+
+- Python 3.11+
 
-### 3) AI Module (optional local test)
-```bash
-cd ai_module
-pip install -r requirements.txt
-```
-
-## Docker Setup
-```bash
+### 2) Create environment files
+```powershell
 copy backend\.env.example backend\.env
 copy frontend\.env.example frontend\.env
+```
+
+### 3) Start the persistent stack
+```powershell
 docker compose up --build
 ```
+
+This starts:
+- MongoDB with a named Docker volume for persistence
+- FastAPI backend
+- Vite frontend
+
+### 4) Open the app
+- Frontend: http://localhost:5173
+- Backend docs: http://localhost:8000/docs
+
+### 5) Stop the stack
+```powershell
+docker compose down
+```
+
+### Optional: local backend/frontend without Docker Mongo
+If you only want a temporary in-memory demo, use the helper script:
+```powershell
+./scripts/start_local_demo.ps1 -UseDockerMongo:$false
+```
+That mode is not persistent across restarts.
 
 ## New Steps Completed
 - Added admin user seeding utility for RBAC demos.
@@ -103,7 +111,7 @@ From the project root in PowerShell:
 ```
 
 This script will:
-- Start MongoDB using Docker (`mongo` service)
+- Start MongoDB using Docker (`mongo` service) with a persistent Docker volume
 - Launch backend in a new PowerShell terminal (creates `.venv`, installs dependencies, starts FastAPI)
 - Launch frontend in a new PowerShell terminal (installs npm packages if needed, starts Vite)
 
@@ -118,6 +126,8 @@ Optional startup flags:
 ```powershell
 ./scripts/start_local_demo.ps1 -UseDockerMongo:$false -BackendPort 8000 -FrontendPort 5173
 ```
+
+Use `-UseDockerMongo:$false` only for temporary in-memory testing.
 
 ## API Smoke Test (Next Step)
 After starting the backend, run:

@@ -104,7 +104,7 @@ function Ensure-DockerDaemon {
 if ($UseDockerMongo) {
     $dockerCommand = Get-Command docker -ErrorAction SilentlyContinue
     if (-not $dockerCommand) {
-        Write-Warning "Docker CLI was not found. Falling back to in-memory mock database mode."
+        Write-Warning "Docker CLI was not found. Falling back to in-memory mock database mode. Install Docker Desktop to use persistent MongoDB."
         $UseDockerMongo = $false
         $useMockDb = $true
     }
@@ -191,6 +191,6 @@ $state | ConvertTo-Json | Set-Content -Path $statePath -Encoding UTF8
 Write-Host "Local demo started."
 Write-Host "Frontend: http://localhost:$FrontendPort"
 Write-Host "Backend:  http://localhost:$BackendPort"
-Write-Host "Database mode: $(if ($useMockDb) { 'mock (in-memory)' } else { 'mongo' })"
+Write-Host "Database mode: $(if ($useMockDb) { 'mock (in-memory)' } else { 'mongo (persistent via Docker volume)' })"
 Write-Host "State file: $statePath"
 Write-Host "Use scripts/stop_local_demo.ps1 to stop launched terminals and Mongo."
