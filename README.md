@@ -345,14 +345,14 @@ Stop demo services:
 
 ## Testing, Build, and CI
 
-## Backend tests
+### Backend tests
 
 ```bash
 cd backend
 python -m pytest -q
 ```
 
-## Frontend production build
+### Frontend production build
 
 ```bash
 cd frontend
@@ -360,7 +360,7 @@ npm ci
 npm run build
 ```
 
-## API smoke flow (manual/local demo)
+### API smoke flow (manual/local demo)
 
 ```powershell
 ./scripts/demo_api_flow.ps1
@@ -372,7 +372,7 @@ This validates end-to-end API behavior:
 - analyze + save mood
 - history, recommendation, analytics, notifications
 
-## CI
+### CI
 
 Workflow: `.github/workflows/ci.yml`
 
