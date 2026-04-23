@@ -14,7 +14,7 @@
 *Intelligent, Gamified, Privacy-First Mental Wellness for University Students*
 
 - AI-powered webcam mood detection
-- Personalised recommendations grounded in CBT, ACT, and Resilience Theory
+- Personalized recommendations grounded in CBT, ACT, and Resilience Theory
 - Gamification for sustained daily engagement
 - Full-stack prototype: React + FastAPI + MongoDB
 
@@ -50,7 +50,7 @@ A full-stack, privacy-first mental wellness platform with seven integrated capab
   ┌──────────────────────────────────────────────────────────┐
   │                     PULSEMIND AI                         │
   │  ┌─────────────┐  ┌───────────────┐  ┌───────────────┐  │
-  │  │  AI Mood    │  │ Personalised  │  │  Psychology   │  │
+  │  │  AI Mood    │  │ Personalized  │  │  Psychology   │  │
   │  │ Detection   │  │Recommendations│  │  Analytics    │  │
   │  └─────────────┘  └───────────────┘  └───────────────┘  │
   │  ┌─────────────┐  ┌───────────────┐  ┌───────────────┐  │
@@ -62,7 +62,7 @@ A full-stack, privacy-first mental wellness platform with seven integrated capab
   └──────────────────────────────────────────────────────────┘
 ```
 
-**Immediate value:** A student opens the app, takes a 2-second mood scan, and gets a personalised action plan — in under 30 seconds.
+**Immediate value:** A student opens the app, takes a 2-second mood scan, and gets a personalized action plan — in under 30 seconds.
 
 ---
 
@@ -241,7 +241,7 @@ POST /api/save-mood
 ```
 GET /api/analytics/summary
    │
-   ├─ Fetch up to 1 000 mood records for authenticated user
+   ├─ Fetch up to 1,000 mood records for authenticated user
    │
    ├─ Group by week  → weekly emotion distribution
    ├─ Group by month → monthly emotion distribution
@@ -266,7 +266,7 @@ GET /api/analytics/summary
 
 ## Slide 9 — Feature Deep-Dive: Recommendation Engine
 
-### Personalised Interventions for Each Emotional State
+### Personalized Interventions for Each Emotional State
 
 ```
 GET /api/recommend
@@ -400,7 +400,7 @@ CORS restricted to configured frontend origin
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| GET | `/api/recommend` | JWT | Personalised recommendation payload |
+| GET | `/api/recommend` | JWT | Personalized recommendation payload |
 
 #### Analytics
 
@@ -731,7 +731,7 @@ cd ..
 | US-02 | Analyze my mood via webcam | I get instant, objective emotional feedback |
 | US-03 | Save my mood entry | I can track emotional patterns over time |
 | US-04 | View my mood history chart | I see weekly and monthly trends |
-| US-05 | Receive AI recommendations | I get personalised, actionable coping suggestions |
+| US-05 | Receive AI recommendations | I get personalized, actionable coping suggestions |
 | US-06 | Earn points and badges | I stay motivated to check in daily |
 
 ### Counsellor
@@ -842,7 +842,6 @@ The following were intentionally deferred:
 | **RBAC** | Role-Based Access Control |
 | **GDPR** | General Data Protection Regulation |
 | **NPS** | Net Promoter Score |
-| **SUS** | System Usability Scale |
 | **IRB** | Institutional Review Board |
 
 ---
@@ -856,7 +855,7 @@ The following were intentionally deferred:
 **What we built:**
 - Full-stack prototype: React + FastAPI + MongoDB
 - AI-powered webcam mood detection with graceful fallback
-- Personalised recommendations grounded in clinical frameworks
+- Personalized recommendations grounded in clinical frameworks
 - Gamification to sustain long-term engagement
 - Privacy-first: no biometrics stored, fields encrypted, rate-limited
 - Automated CI and comprehensive documentation
