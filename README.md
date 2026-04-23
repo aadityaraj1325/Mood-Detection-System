@@ -444,7 +444,7 @@ Run pre-demo validator:
 
 ## Roadmap / Future Enhancements
 
-- wearable data integration
-- multilingual recommendation content
-- richer notification channels (push/email)
-- stronger mood modeling and privacy-preserving learning strategies
+- Wearable data integration
+- Multilingual recommendation content
+- Richer notification channels (push/email)
+- Stronger mood modeling and privacy-preserving learning strategies
