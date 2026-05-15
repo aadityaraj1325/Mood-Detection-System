@@ -1,3 +1,6 @@
+import json
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +20,29 @@ class Settings(BaseSettings):
 
     rate_limit_auth: str = "5/minute"
     rate_limit_api: str = "60/minute"
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value):
+        if isinstance(value, list):
+            return [str(item).rstrip("/") for item in value if str(item).strip()]
+
+        if isinstance(value, str):
+            raw = value.strip()
+            if not raw:
+                return ["http://localhost:5173"]
+
+            if raw.startswith("["):
+                try:
+                    parsed = json.loads(raw)
+                    if isinstance(parsed, list):
+                        return [str(item).rstrip("/") for item in parsed if str(item).strip()]
+                except json.JSONDecodeError:
+                    pass
+
+            return [item.strip().rstrip("/") for item in raw.split(",") if item.strip()]
+
+        return value
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

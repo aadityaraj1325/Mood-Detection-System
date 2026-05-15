@@ -19,11 +19,11 @@ export const useUIStore = create((set) => ({
   sidebarOpen: true,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
-  theme: 'neural-dark',
+  theme: 'dark',
   setTheme: (theme) => set({ theme }),
   toggleTheme: () =>
     set((state) => ({
-      theme: state.theme === 'neural-dark' ? 'neural-light' : 'neural-dark'
+      theme: state.theme === 'dark' ? 'light' : 'dark'
     })),
 
   toasts: [],

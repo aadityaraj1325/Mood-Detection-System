@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BarChart3, Brain, LayoutDashboard, Sparkles, User } from 'lucide-react';
+import { BarChart3, Brain, LayoutDashboard, Sparkles, User, Gamepad2, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const links = [
@@ -7,12 +7,14 @@ const links = [
   { to: '/mood', label: 'Mood', icon: Brain },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/recommendations', label: 'Recommend', icon: Sparkles },
+  { to: '/games', label: 'Games', icon: Gamepad2 },
+  { to: '/community', label: 'Community', icon: Users },
   { to: '/achievements', label: 'Profile', icon: User }
 ];
 
 function BottomNav() {
   return (
-    <nav className="glass-card fixed bottom-3 left-3 right-3 z-sidebar grid grid-cols-5 gap-1 p-2 lg:hidden">
+    <nav className="glass-card fixed bottom-3 left-3 right-3 z-sidebar grid grid-cols-7 gap-1 p-2 lg:hidden">
       {links.map((item) => {
         const Icon = item.icon;
         return (

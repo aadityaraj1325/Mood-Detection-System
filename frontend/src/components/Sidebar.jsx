@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Brain, History, LayoutDashboard, LogOut, Menu, Sparkles, Trophy } from 'lucide-react';
+import { Brain, History, LayoutDashboard, LogOut, Menu, Sparkles, Trophy, Gamepad2, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 
@@ -8,6 +8,8 @@ const links = [
   { to: '/mood', label: 'Mood Detect', icon: Brain },
   { to: '/analytics', label: 'Analytics', icon: History },
   { to: '/recommendations', label: 'Recommend', icon: Sparkles },
+  { to: '/games', label: 'Games', icon: Gamepad2 },
+  { to: '/community', label: 'Community', icon: Users },
   { to: '/achievements', label: 'Achievements', icon: Trophy }
 ];
 

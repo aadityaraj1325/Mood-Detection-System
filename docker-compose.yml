@@ -25,7 +25,7 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - '5173:5173'
+      - '5173:80'
 
 volumes:
   mongo_data:

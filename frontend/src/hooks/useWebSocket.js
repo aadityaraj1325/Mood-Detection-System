@@ -2,6 +2,25 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from './useAuth';
 import { useUiStore } from '../store/uiStore';
 
+function resolveWsBase() {
+  const explicit = import.meta.env.VITE_WS_BASE_URL;
+  if (explicit) return String(explicit).replace(/\/+$/, '');
+
+  const apiBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  if (apiBase) {
+    const normalizedApi = String(apiBase).replace(/\/+$/, '');
+    const wsApi = normalizedApi.replace(/^http/i, 'ws');
+    return /\/api$/i.test(wsApi) ? `${wsApi}/ws/mood` : `${wsApi}/api/ws/mood`;
+  }
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const wsOrigin = window.location.origin.replace(/^http/i, 'ws');
+    return `${wsOrigin}/api/ws/mood`;
+  }
+
+  return 'ws://localhost:8000/api/ws/mood';
+}
+
 export function useWebSocket() {
   const socketRef = useRef(null);
   const { user, token } = useAuth();
@@ -10,7 +29,7 @@ export function useWebSocket() {
   useEffect(() => {
     if (!user?.id || !token) return;
 
-    const wsBase = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8000/api/ws/mood';
+    const wsBase = resolveWsBase();
     const socket = new WebSocket(`${wsBase}/${user.id}`);
     socketRef.current = socket;
 

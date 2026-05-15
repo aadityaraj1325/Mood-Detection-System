@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
+import { useUiStore } from '../../store/uiStore';
 
 function ParticleField() {
+  const theme = useUiStore((state) => state.theme);
+
   const particles = useMemo(
     () =>
       Array.from({ length: 20 }).map((_, index) => ({
@@ -24,6 +27,9 @@ function ParticleField() {
     length: 60 + Math.round(Math.random() * 120),
     opacity: 0.08 + Math.random() * 0.16
   }));
+
+  // Don't render particles in light mode
+  if (theme === 'light') return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

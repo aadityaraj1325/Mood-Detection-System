@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from app.api.routes import analytics, auth, mood, notifications, recommendation, websocket
+from app.api.routes import activity, analytics, auth, journal, games, community, mood, notifications, recommendation, websocket
 from app.core.config import settings
 from app.core.database import close_mongo_connection, connect_to_mongo, get_db
 from app.core.rate_limiter import limiter
@@ -36,6 +36,10 @@ app.include_router(recommendation.router, prefix=settings.api_prefix)
 app.include_router(analytics.router, prefix=settings.api_prefix)
 app.include_router(notifications.router, prefix=settings.api_prefix)
 app.include_router(websocket.router, prefix=settings.api_prefix)
+app.include_router(journal.router, prefix=settings.api_prefix)
+app.include_router(games.router, prefix=settings.api_prefix)
+app.include_router(community.router, prefix=settings.api_prefix)
+app.include_router(activity.router, prefix=settings.api_prefix)
 
 
 @app.get("/")

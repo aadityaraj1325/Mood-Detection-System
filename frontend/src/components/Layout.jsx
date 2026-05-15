@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import {
   Bell,
   MoonStar,
-  Search,
   Sun,
   Target,
   X
@@ -26,11 +25,15 @@ function Layout() {
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme !== 'light');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [theme]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-mesh-dark text-slate-100">
+    <div className="relative min-h-screen overflow-hidden transition-colors duration-300" style={{ background: 'var(--gradient-void)', color: 'var(--text-primary)' }}>
       <ParticleField />
 
       <div className="relative z-10 flex min-h-screen">
@@ -55,13 +58,6 @@ function Layout() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 sm:flex">
-                <Search size={16} className="text-slate-400" />
-                <input
-                  className="w-52 bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
-                  placeholder="Search insights"
-                />
-              </div>
 
               <button
                 className="ripple-btn rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-cyan-200"
@@ -72,10 +68,10 @@ function Layout() {
               </button>
 
               <div className="group relative">
-                <button className="ripple-btn rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-cyan-200">
+                {/* <button className="ripple-btn rounded-xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-cyan-200">
                   <Bell size={18} />
-                </button>
-                <div className="pointer-events-none absolute right-0 top-12 z-40 w-80 translate-y-2 rounded-2xl border border-white/15 bg-slate-950/95 p-3 opacity-0 shadow-card backdrop-blur-xl transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+                </button> */}
+                <div className="pointer-events-none absolute right-0 top-12 z-40 w-80 translate-y-2 rounded-2xl border border-border-glass p-3 opacity-0 shadow-card backdrop-blur-xl transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100" style={{ background: 'var(--bg-deep)' }}>
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-sm font-semibold">Real-time Alerts</p>
                     <Target size={14} className="text-cyan-300" />

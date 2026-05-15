@@ -22,3 +22,9 @@ frontend/.env
 # OS
 .DS_Store
 Thumbs.db
+AGENT_RULES.md
+PREVIOUS_TASK.md
+DEPLOYMENT_CHECKLIST.md
+DEPLOYMENT_STATUS.md
+TASK_LIST.md
+prd.md
