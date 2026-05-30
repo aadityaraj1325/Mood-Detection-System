@@ -1,5 +1,7 @@
 # CI Pipeline Guide
 
+For a production-style hosting path using Fly.io, Vercel, and MongoDB Atlas, see [deployment_fly_vercel_atlas.md](deployment_fly_vercel_atlas.md).
+
 ## Workflow File
 - .github/workflows/ci.yml
 

@@ -1,15 +1,19 @@
 FROM python:3.11-slim
 
+RUN useradd -m -u 1000 user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
+
 WORKDIR /app
 # No system GUI libraries needed for headless opencv
 
 
-COPY backend/requirements.txt ./requirements.txt
+COPY --chown=user backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/app ./app
-COPY ai_module ./ai_module
+COPY --chown=user backend/app ./app
+COPY --chown=user ai_module ./ai_module
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]

@@ -157,3 +157,9 @@ Last Updated: 2026-04-21 20:49
 - [✅] 15.3 AI Filter: Implement automated crisis keyword filtering on new posts that triggers counselor alerts.
 - [✅] 15.4 Frontend: Build CommunityPage.jsx with topic threads (Academic Stress, Self-Care, etc.).
 - [✅] 15.5 Frontend: Build moderation UI tools for Counsellor role to remove flagged posts.
+
+## PHASE 16 — Deployment
+- [✅] 16.1 Configuration: Update environment variables (.env) for MongoDB Atlas and Vercel CORS.
+- [ ] 16.2 Backend: Install Fly CLI, authenticate, and initialize Fly app.
+- [ ] 16.3 Backend: Set up fly secrets and deploy the application.
+- [ ] 16.4 Frontend: Deploy to Vercel and link VITE_API_BASE_URL to fly.io app.

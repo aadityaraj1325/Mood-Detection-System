@@ -7,6 +7,7 @@ function resolveWsBase() {
   if (explicit) return String(explicit).replace(/\/+$/, '');
 
   const apiBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+  console.log(apiBase);
   if (apiBase) {
     const normalizedApi = String(apiBase).replace(/\/+$/, '');
     const wsApi = normalizedApi.replace(/^http/i, 'ws');

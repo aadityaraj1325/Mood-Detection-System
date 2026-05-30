@@ -5,6 +5,7 @@ const configuredBase =
   import.meta.env.VITE_API_BASE_URL ||
   'http://localhost:8000';
 
+  console.log('API Base URL:', configuredBase);
 const normalizedBase = String(configuredBase).replace(/\/+$/, '');
 const baseURL = /\/api$/i.test(normalizedBase)
   ? normalizedBase

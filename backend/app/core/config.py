@@ -1,5 +1,5 @@
 import json
-
+import os
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     mongodb_db_name: str = "mood_detection_system"
     use_mock_db: bool = False
 
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = os.getenv("CORS_ORIGINS", "http://localhost:5173")
 
     rate_limit_auth: str = "5/minute"
     rate_limit_api: str = "60/minute"
